@@ -126,8 +126,7 @@ class Stack {
 			/// ------------------------------------------------------------------------------------ ///
 
 			if (this->head == nullptr) {
-				if (this->head == nullptr) {
-					throw nullptrProbed(); // Can't access this value of the stack, stack probe led to nullptr
+				throw nullptrProbed(); // Can't access this value of the stack, stack probe led to nullptr
 			}
 			return this->head->data;
 		}

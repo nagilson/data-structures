@@ -133,7 +133,7 @@ class linkedList {
 				++loc;
 			}
 			if (current->next == nullptr && i+1 != this->length) {
-				throw nullptrProbed(); // Can't access this value of the stack, stack probe led to nullptr
+				throw nullptrProbed(); // Can't access this value of the list, probe led to nullptr
 			}
 			else {
 				return current->data;
@@ -212,7 +212,7 @@ void linkedList<T>::deleteNode (const int where) {
 			++i;
 		}
 		if (current->next == nullptr && where+1 != this->length) {
-			throw nullptrProbed(); // Can't access this value of the stack, stack probe led to nullptr
+			throw nullptrProbed(); // Can't access this value of the list, probe led to nullptr
 		}
 		else {
 			if (where+1 == this->length) {

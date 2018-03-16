@@ -1,6 +1,6 @@
 /// ------------------------------------------------------------------------------------ ///
 /*
-The following .cpp file includes an implementation of the queue data structure in C++, based
+The following .h file includes an implementation of the queue data structure in C++, based
 upon a linked list like structure using nodes.
 */
 /// ------------------------------------------------------------------------------------ ///

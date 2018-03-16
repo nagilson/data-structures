@@ -1,7 +1,7 @@
 #pragma once
 /// ------------------------------------------------------------------------------------ ///
 /*
-The following .cpp file includes an implementation of the binary search tree structure,
+The following .h file includes an implementation of the binary search tree structure,
 using right and left Nodes. Created without any textbook/internet reference. ;) (not optimized)
 */
 /// ------------------------------------------------------------------------------------ ///

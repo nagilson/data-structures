@@ -1,11 +1,30 @@
 #pragma once
+/// ------------------------------------------------------------------------------------ ///
+/*
+The following .h file includes an implementation of the BINARY heap, of types
+... min and max, using std::vector.
+*/
+/// ------------------------------------------------------------------------------------ ///
 #include <vector>
 #include <iostream>
 
 template <typename T>
 class Heap{
 
+	/// ------------------------------------------------------------------------------------ ///
+	/*
+	The heap data structure is a tree structure, where each parent >= (max) or (min) <= ALL children. 
+	It comes in many types, but this heap is implemented as an array (std::vector). 
+	It is a binary heap (not a binary tree) and contains both a max implementation and a min implementation.
+
+	bool isMinType is true if the minima is at the root, else, the maxima is at the root.
+	The heap contains a capacity, the maximum allocation for elements in the heap, and a current size.
+	Constructor takes a size and true or false depending on whether or not if the root is the minima.
+	*/
+	/// ------------------------------------------------------------------------------------ ///
+
 	private:
+
 		std::vector<T> heap;
 		bool minType; // If false, max is at root.
 		int capacity;
@@ -173,10 +192,38 @@ class Heap{
 			else {
 				this->minType = false;
 			}
-
 			this->capacity = reserveSizeMax - 1;
 			this->heap.reserve(reserveSizeMax);
 			this->currentSize = 0;
+
+		}
+
+		Heap<T>(const int &arrSize, bool minAtTop, int[] arr) {
+
+			if (minAtTop) {
+				this->minType = true;
+			}
+			else {
+				this->minType = false;
+			}
+			this->capacity = arrSize - 1;
+			this->heap.reserve(arrSize);
+			this->currentSize = 0;
+
+			int i = arrSize / 2;
+			if (minAtTop) {
+				while (i < 0) {
+					heapifyMinArr(i);
+					--i;
+				}
+			}
+			else {
+				while (i < 0) {
+					heapifyMaxDel(i);
+					--i;
+				}
+			}
+
 		}
 
 		void print() {
@@ -199,14 +246,15 @@ class Heap{
 			}
 		}
 
-		void deleteRoot() {
+		T extractRoot() {
 
 			if (this->currentSize == 0) {
 				// Tree is empty.
-				return;
+				throw;
 			}
 
 			else {
+				T top = this->heap[0];
 
 				this->heap[0] = this->heap[this->currentSize -1];
 				this->heap.pop_back();
@@ -220,6 +268,8 @@ class Heap{
 				else {
 					heapifyMaxDel(0);
 				}
+
+				return top;
 			}
 		}
 		

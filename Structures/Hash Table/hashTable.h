@@ -1,7 +1,7 @@
 #pragma once
 /// ------------------------------------------------------------------------------------ ///
 /*
-The following .cpp file includes an implementation of the hash table structure, using bucket nodes ...
+The following .h file includes an implementation of the hash table structure, using bucket nodes ...
 and linear probing. Implemented cases: K = int, V = str, K = str, V = int.
 */
 /// ------------------------------------------------------------------------------------ ///

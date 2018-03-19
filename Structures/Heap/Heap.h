@@ -38,14 +38,14 @@ class Heap{
 		
 		void heapifyInsert(int where) {
 			if (this->minType) {
-				heapifyMinIns(where);
+				heapifyMinUp(where);
 			}
 			else {
-				heapifyMaxIns(where);
+				heapifyMaxUp(where);
 			}
 		}
 
-		void heapifyMinIns(int where) {
+		void heapifyMinUp(int where) {
 
 			int parentLoc = parent(where);
 			T parent = this->heap[parentLoc];
@@ -56,11 +56,11 @@ class Heap{
 			}
 			else {
 				swap(parentLoc, where);
-				heapifyMinIns(parentLoc);
+				heapifyMinUp(parentLoc);
 			}
 		}
 
-		void heapifyMaxIns(int where) {
+		void heapifyMaxUp(int where) {
 
 			int parentLoc = parent(where);
 			T parent = this->heap[parentLoc];
@@ -71,11 +71,11 @@ class Heap{
 			}
 			else {
 				swap(parentLoc, where);
-				heapifyMaxIns(parentLoc);
+				heapifyMaxUp(parentLoc);
 			}
 		}
 
-		void heapifyMinDel(int where) {
+		void heapifyMinDown(int where) {
 
 			int rightChildLoc = (where + 1) * 2;
 			int leftChildLoc = rightChildLoc - 1;
@@ -91,7 +91,7 @@ class Heap{
 				if (this->heap[leftChildLoc] < this->heap[where]) {
 					// If the child of the node is less than the parent!
 					swap(leftChildLoc, where); // Swap the child and parent.
-					heapifyMinDel(leftChildLoc);
+					heapifyMinDown(leftChildLoc);
 				}
 				else {
 					return; // The property is satisfied.
@@ -105,7 +105,7 @@ class Heap{
 					if (this->heap[rightChildLoc] < this->heap[where]) {
 						// The right child is smaller than the parent.
 						swap(rightChildLoc, where);
-						heapifyMinDel(rightChildLoc);
+						heapifyMinDown(rightChildLoc);
 					}
 					else {
 						return; // The property is valid.
@@ -116,7 +116,7 @@ class Heap{
 					if (this->heap[leftChildLoc] < this->heap[where]) {
 						// The left child could be the new minima.
 						swap(leftChildLoc, where);
-						heapifyMinDel(leftChildLoc);
+						heapifyMinDown(leftChildLoc);
 					}
 					else {
 						return; // The property is valid.
@@ -125,7 +125,7 @@ class Heap{
 			}
 		}
 
-		void heapifyMaxDel(int where) {
+		void heapifyMaxDown(int where) {
 
 			int rightChildLoc = (where + 1) * 2;
 			int leftChildLoc = rightChildLoc - 1;
@@ -141,7 +141,7 @@ class Heap{
 				if (this->heap[leftChildLoc] > this->heap[where]) {
 					// If the child of the node is less than the parent!
 					swap(leftChildLoc, where); // Swap the child and parent.
-					heapifyMaxDel(leftChildLoc);
+					heapifyMaxDown(leftChildLoc);
 				}
 				else {
 					return; // The property is satisfied.
@@ -155,7 +155,7 @@ class Heap{
 					if (this->heap[rightChildLoc] > this->heap[where]) {
 						// The right child is smaller than the parent.
 						swap(rightChildLoc, where);
-						heapifyMaxDel(rightChildLoc);
+						heapifyMaxDown(rightChildLoc);
 					}
 					else {
 						return; // The property is valid.
@@ -166,7 +166,7 @@ class Heap{
 					if (this->heap[leftChildLoc] > this->heap[where]) {
 						// The left child could be the new minima.
 						swap(leftChildLoc, where);
-						heapifyMaxDel(leftChildLoc);
+						heapifyMaxDown(leftChildLoc);
 					}
 					else {
 						return; // The property is valid.
@@ -217,13 +217,13 @@ class Heap{
 			int k = (arrSize / 2) -1;
 			if (minAtTop) {
 				while (k > -1) {
-					heapifyMinDel(k);
+					heapifyMinDown(k);
 					--k;
 				}
 			}
 			else {
 				while (k > -1) {
-					heapifyMaxDel(k);
+					heapifyMaxDown(k);
 					--k;
 				}
 			}
@@ -266,11 +266,11 @@ class Heap{
 
 
 				if (this->minType == true) {
-					heapifyMinDel(0);
+					heapifyMinDown(0);
 				}
 
 				else {
-					heapifyMaxDel(0);
+					heapifyMaxDown(0);
 				}
 
 				return top;

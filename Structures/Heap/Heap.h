@@ -192,13 +192,13 @@ class Heap{
 			else {
 				this->minType = false;
 			}
-			this->capacity = reserveSizeMax - 1;
+			this->capacity = reserveSizeMax;
 			this->heap.reserve(reserveSizeMax);
 			this->currentSize = 0;
 
 		}
-
-		Heap<T>(const int &arrSize, bool minAtTop, int[] arr) {
+		
+		Heap<T>(const int &arrSize, bool minAtTop, T arr[]) {
 
 			if (minAtTop) {
 				this->minType = true;
@@ -206,21 +206,25 @@ class Heap{
 			else {
 				this->minType = false;
 			}
-			this->capacity = arrSize - 1;
+			this->capacity = arrSize;
 			this->heap.reserve(arrSize);
-			this->currentSize = 0;
+			this->currentSize = arrSize;
 
-			int i = arrSize / 2;
+			for (auto i = 0; i != (arrSize); ++i) {
+				this->heap.push_back(arr[i]);
+			}
+
+			int k = (arrSize / 2) -1;
 			if (minAtTop) {
-				while (i < 0) {
-					heapifyMinArr(i);
-					--i;
+				while (k > -1) {
+					heapifyMinDel(k);
+					--k;
 				}
 			}
 			else {
-				while (i < 0) {
-					heapifyMaxDel(i);
-					--i;
+				while (k > -1) {
+					heapifyMaxDel(k);
+					--k;
 				}
 			}
 

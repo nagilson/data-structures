@@ -1,10 +1,11 @@
 #pragma once
 /// ------------------------------------------------------------------------------------ ///
 /*
-The following .h file includes an implementation of the BINARY heap, of types
+The following .h file includes an implementation of the binary heap, of types
 ... min and max, using std::vector.
 */
 /// ------------------------------------------------------------------------------------ ///
+
 #include <vector>
 #include <iostream>
 
@@ -13,9 +14,10 @@ class Heap{
 
 	/// ------------------------------------------------------------------------------------ ///
 	/*
-	The heap data structure is a tree structure, where each parent >= (max) or (min) <= ALL children. 
-	It comes in many types, but this heap is implemented as an array (std::vector). 
+	The heap data structure is a complete tree structure, where each parent >= (max) or (min) <= ALL children. 
+	It comes in many types, but this heap is implemented as an "array" (std::vector). 
 	It is a binary heap (not a binary tree) and contains both a max implementation and a min implementation.
+	Heaps are typically used as priority queues (order is not based on first in, but who is "more important.") 
 
 	bool isMinType is true if the minima is at the root, else, the maxima is at the root.
 	The heap contains a capacity, the maximum allocation for elements in the heap, and a current size.
@@ -31,12 +33,27 @@ class Heap{
 		int currentSize;
 		 
 		void swap(int pos1, int pos2) {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Swap the nodes in the heap at a given group of positions, pos1 and pos2.
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
 			T temp = this->heap[pos1];
 			this->heap[pos1] = this->heap[pos2];
 			this->heap[pos2] = temp;
 		}
 		
 		void heapifyInsert(int where) {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Interface that allows insertion into the heap without an explicit boolean parameter.
+			Calls heapifyUp for either min or max depending on minType of the tree *this.
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
 			if (this->minType) {
 				heapifyMinUp(where);
 			}
@@ -46,6 +63,13 @@ class Heap{
 		}
 
 		void heapifyMinUp(int where) {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Going up the tree, swap the parents if need be to ensure the minima is at the top. (use after INSERTION.)
+			Typical time is O(1), bounded by O(lgn)
+			*/
+			/// ------------------------------------------------------------------------------------ ///
 
 			int parentLoc = parent(where);
 			T parent = this->heap[parentLoc];
@@ -62,6 +86,13 @@ class Heap{
 
 		void heapifyMaxUp(int where) {
 
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Going up the tree, swap the parents if need be to ensure the maxima is at the top (use after INSERTION.)
+			Typical time is O(1), bounded by O(lgn)
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
 			int parentLoc = parent(where);
 			T parent = this->heap[parentLoc];
 			T child = this->heap[where];
@@ -76,6 +107,13 @@ class Heap{
 		}
 
 		void heapifyMinDown(int where) {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Going down the tree, assure that the heap is balanced with the minima at a parent P.
+			Typical time is O(lgn)
+			*/
+			/// ------------------------------------------------------------------------------------ ///
 
 			int rightChildLoc = (where + 1) * 2;
 			int leftChildLoc = rightChildLoc - 1;
@@ -103,7 +141,6 @@ class Heap{
 				if (this->heap[leftChildLoc] > this->heap[rightChildLoc]) {
 					// the right child is the smaller child.
 					if (this->heap[rightChildLoc] < this->heap[where]) {
-						// The right child is smaller than the parent.
 						swap(rightChildLoc, where);
 						heapifyMinDown(rightChildLoc);
 					}
@@ -114,7 +151,6 @@ class Heap{
 				else {
 					// the left child is the smaller child.
 					if (this->heap[leftChildLoc] < this->heap[where]) {
-						// The left child could be the new minima.
 						swap(leftChildLoc, where);
 						heapifyMinDown(leftChildLoc);
 					}
@@ -126,6 +162,13 @@ class Heap{
 		}
 
 		void heapifyMaxDown(int where) {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Going down the tree, assure that the heap is balanced with the maxima at a parent P.
+			Typical time is O(lgn)
+			*/
+			/// ------------------------------------------------------------------------------------ ///
 
 			int rightChildLoc = (where + 1) * 2;
 			int leftChildLoc = rightChildLoc - 1;
@@ -153,7 +196,6 @@ class Heap{
 				if (this->heap[leftChildLoc] < this->heap[rightChildLoc]) {
 					// the right child is the smaller child.
 					if (this->heap[rightChildLoc] > this->heap[where]) {
-						// The right child is smaller than the parent.
 						swap(rightChildLoc, where);
 						heapifyMaxDown(rightChildLoc);
 					}
@@ -164,7 +206,6 @@ class Heap{
 				else {
 					// the left child is the smaller child.
 					if (this->heap[leftChildLoc] > this->heap[where]) {
-						// The left child could be the new minima.
 						swap(leftChildLoc, where);
 						heapifyMaxDown(leftChildLoc);
 					}
@@ -179,12 +220,26 @@ class Heap{
 		}
 
 		int parent(int where) {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Returns an integer index of the parent node of a child at position WHERE, 0 if no parent.
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
 			return (where <= 0) ? 0 : ((where - 1) / 2);
 		}
 
 	public:
 
 		Heap<T>(const int &reserveSizeMax, bool minAtTop) {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			reserveSizeMax - max amount of elements in the heap.
+			minAtTop - true if mini heap, false if max heap. O(1) time.
+			*/
+			/// ------------------------------------------------------------------------------------ ///
 			
 			if (minAtTop) {
 				this->minType = true;
@@ -199,6 +254,17 @@ class Heap{
 		}
 		
 		Heap<T>(const int &arrSize, bool minAtTop, T arr[]) {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			minAtTop - True if mini tree, false if max tree.
+			An array of type T is passed and used to construct the heap.
+
+			Typically takes O(n) time. On a basic analysis, it appears this would take 
+			... O(nlgn) time, because you insert at lgn each time, but the time complexity 
+			... can be written as a series that converges to n. Refer to MIT Heaps and Heap Sort. 
+			*/
+			/// ------------------------------------------------------------------------------------ ///
 
 			if (minAtTop) {
 				this->minType = true;
@@ -231,6 +297,13 @@ class Heap{
 		}
 
 		void print() {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Print the heap in an array / list liek representation.
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
 			std::cout << "[ ";
 			for (auto member : this->heap) {
 				std::cout << member << " ";
@@ -239,6 +312,14 @@ class Heap{
 		}
 
 		void insert(T what) {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Inserts and then heapifies up using private functions.
+			Typical time is O(lgn)
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
 			if (this->currentSize >= this->capacity) {
 				std::cout << "\n<ERR: The heap is full, or insertion too big.>\n";
 				return;
@@ -251,6 +332,12 @@ class Heap{
 		}
 
 		T extractRoot() {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Throws if empty tree, else returns max or min depending upon the tree type, THEN removes the top. O(1).
+			*/
+			/// ------------------------------------------------------------------------------------ ///
 
 			if (this->currentSize == 0) {
 				// Tree is empty.
@@ -278,6 +365,13 @@ class Heap{
 		}
 		
 		T getRoot() {
+
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Get the tree top WITHOUT popping. O(1).
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
 			if (this->currentSize == 0) {
 				// Tree is empty
 				throw;

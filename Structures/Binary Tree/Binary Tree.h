@@ -362,7 +362,7 @@ public:
 		/// ------------------------------------------------------------------------------------ ///
 		/*
 		Find and erase a node in the tree with content what.
-		Returns void if node doesn't exist.
+		Returns instantly if node doesn't exist.
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 

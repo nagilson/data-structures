@@ -1,285 +1,510 @@
 #pragma once
 /// ------------------------------------------------------------------------------------ ///
 /*
-The following .h file includes an implementation of the BINARY heap, of types
-... min and max, using std::vector.
+The following .h file includes an implementation of the hash table structure, using bucket nodes ...
+and linear probing. Implemented cases: K = int, V = str, K = str, V = int.
 */
 /// ------------------------------------------------------------------------------------ ///
-#include <vector>
-#include <iostream>
 
-template <typename T>
-class Heap{
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <string>
+
+template <typename K, typename V>
+struct Bucket {
 
 	/// ------------------------------------------------------------------------------------ ///
 	/*
-	The heap data structure is a tree structure, where each parent >= (max) or (min) <= ALL children. 
-	It comes in many types, but this heap is implemented as an array (std::vector). 
-	It is a binary heap (not a binary tree) and contains both a max implementation and a min implementation.
+	Bucket class is a node / entry of the hash table. 
+	Type K is for the key type, V for the value type. 
+	K will be used for lookup. V should never point to a null object. 
+	*/
+	/// ------------------------------------------------------------------------------------ ///
 
-	bool isMinType is true if the minima is at the root, else, the maxima is at the root.
-	The heap contains a capacity, the maximum allocation for elements in the heap, and a current size.
-	Constructor takes a size and true or false depending on whether or not if the root is the minima.
+	K key;
+	V value;
+
+	Bucket(K key, V value) {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Normal bucket constructor. 
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		this->key = key;
+		this->value = value;
+	}
+
+	Bucket() {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Empty bucket constructor. We assume K is int, V is str.
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		this->key = K(-1);
+		this->value = V("");
+	}
+
+	void print() {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Using std::cout, give a formatted view of the key and value of the bucket. 
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		std::cout << "Key: " << this->key << " | Value: " << this->value << "\n";
+	}
+
+	bool isEmpty() {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Return true if empty. -1 Means empty since start, -2 means emptied at some point in execution. 
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		return (this->key == K(-1) || this->key == K(-2));
+	}
+
+};
+
+template <typename K, typename V>
+class hashTable {
+
+	/// ------------------------------------------------------------------------------------ ///
+	/*
+	hashTable class with keys of type K (assumed int) and values V (assumed str.) 
+	Enforces linear probing over chaining methods, and uses sub-struct Buckets to contain entries.
+	The goal of a hashtable is to insert, find, and remove at O(1) time like an array. 
+
+	We use a hashing function to change a key, K, into an integer index for the table, which allows us to access [hypothetically] ~O(1).
+	Sometimes hash functions do not provide a perfect hash :: h(K) may == h(K2) even if K != k2...
+		... Which is why we use linear probing, and thus worst time is O(n) but very unlikely.
 	*/
 	/// ------------------------------------------------------------------------------------ ///
 
 	private:
+		std::vector<Bucket<K, V>> table;
+		const int size; // intialized size (aim to keep size around this point for optimal time complexity)
+		int contains; // Actual used values in the table. 
 
-		std::vector<T> heap;
-		bool minType; // If false, max is at root.
-		int capacity;
-		int currentSize;
-		 
-		void swap(int pos1, int pos2) {
-			T temp = this->heap[pos1];
-			this->heap[pos1] = this->heap[pos2];
-			this->heap[pos2] = temp;
-		}
-		
-		void heapifyInsert(int where) {
-			if (this->minType) {
-				heapifyMinIns(where);
-			}
-			else {
-				heapifyMaxIns(where);
-			}
-		}
+		int hash(K key) {
 
-		void heapifyMinIns(int where) {
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Rudimentary hash function, modulus is applied to a key by the const size.
+			If K was a string, we could provide specialization and use Berstein's hash.
+			*/
+			/// ------------------------------------------------------------------------------------ ///
 
-			int parentLoc = parent(where);
-			T parent = this->heap[parentLoc];
-			T child = this->heap[where];
-
-			if (parent <= child){
-				return;
-			}
-			else {
-				swap(parentLoc, where);
-				heapifyMinIns(parentLoc);
-			}
-		}
-
-		void heapifyMaxIns(int where) {
-
-			int parentLoc = parent(where);
-			T parent = this->heap[parentLoc];
-			T child = this->heap[where];
-
-			if (parent >= child) {
-				return;
-			}
-			else {
-				swap(parentLoc, where);
-				heapifyMaxIns(parentLoc);
-			}
-		}
-
-		void heapifyMinDel(int where) {
-
-			int rightChildLoc = (where + 1) * 2;
-			int leftChildLoc = rightChildLoc - 1;
-
-
-			if (leftChildLoc > this->currentSize - 1) {
-				// The node at WHERE has no children. Property is good.
-				return;
-			}
-			else if (rightChildLoc > this->currentSize - 1) {
-				// The node has 1 child.
-
-				if (this->heap[leftChildLoc] < this->heap[where]) {
-					// If the child of the node is less than the parent!
-					swap(leftChildLoc, where); // Swap the child and parent.
-					heapifyMinDel(leftChildLoc);
-				}
-				else {
-					return; // The property is satisfied.
-				}
-			}
-			else {
-				// The node has 2 children.
-				// Find the lower child: 
-				if (this->heap[leftChildLoc] > this->heap[rightChildLoc]) {
-					// the right child is the smaller child.
-					if (this->heap[rightChildLoc] < this->heap[where]) {
-						// The right child is smaller than the parent.
-						swap(rightChildLoc, where);
-						heapifyMinDel(rightChildLoc);
-					}
-					else {
-						return; // The property is valid.
-					}
-				}
-				else {
-					// the left child is the smaller child.
-					if (this->heap[leftChildLoc] < this->heap[where]) {
-						// The left child could be the new minima.
-						swap(leftChildLoc, where);
-						heapifyMinDel(leftChildLoc);
-					}
-					else {
-						return; // The property is valid.
-					}
-				}
-			}
-		}
-
-		void heapifyMaxDel(int where) {
-
-			int rightChildLoc = (where + 1) * 2;
-			int leftChildLoc = rightChildLoc - 1;
-
-
-			if (leftChildLoc > this->currentSize - 1) {
-				// The node at WHERE has no children. Property is good.
-				return;
-			}
-			else if (rightChildLoc > this->currentSize - 1) {
-				// The node has 1 child.
-
-				if (this->heap[leftChildLoc] > this->heap[where]) {
-					// If the child of the node is less than the parent!
-					swap(leftChildLoc, where); // Swap the child and parent.
-					heapifyMaxDel(leftChildLoc);
-				}
-				else {
-					return; // The property is satisfied.
-				}
-			}
-			else {
-				// The node has 2 children.
-				// Find the lower child: 
-				if (this->heap[leftChildLoc] < this->heap[rightChildLoc]) {
-					// the right child is the smaller child.
-					if (this->heap[rightChildLoc] > this->heap[where]) {
-						// The right child is smaller than the parent.
-						swap(rightChildLoc, where);
-						heapifyMaxDel(rightChildLoc);
-					}
-					else {
-						return; // The property is valid.
-					}
-				}
-				else {
-					// the left child is the smaller child.
-					if (this->heap[leftChildLoc] > this->heap[where]) {
-						// The left child could be the new minima.
-						swap(leftChildLoc, where);
-						heapifyMaxDel(leftChildLoc);
-					}
-					else {
-						return; // The property is valid.
-					}
-				}
-			}
-
-
-
-		}
-
-		int parent(int where) {
-			return (where <= 0) ? 0 : ((where - 1) / 2);
+			return key % this->size;
 		}
 
 	public:
 
-		Heap<T>(const int &reserveSizeMax, bool minAtTop) {
-			
-			if (minAtTop) {
-				this->minType = true;
-			}
-			else {
-				this->minType = false;
-			}
-			this->capacity = reserveSizeMax - 1;
-			this->heap.reserve(reserveSizeMax);
-			this->currentSize = 0;
+		hashTable(const int sizeParam) : size(sizeParam), table(sizeParam, Bucket<K, V>()) {
 
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Default initialization, initialization list lets us construct const member. 
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
+			this->contains = sizeParam;
 		}
 
-		Heap<T>(const int &arrSize, bool minAtTop, int[] arr) {
+		void insert(const K key, const V &value) {
 
-			if (minAtTop) {
-				this->minType = true;
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Insert to the bucket. O(1) time if no collision. Else, possible O(n) time. 
+			If the bucket is full, we will append to the bucket.
+			This appending will slow down the overall speed of the hash table.
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
+			const Bucket<K, V> insertion(key, value);
+			int position = hash(key);
+
+			if (this->table[position].isEmpty()) {
+				this->table[position] = insertion;
+				return; // No collision, so the insertion is complete at O(1)! 
+			}
+			else if (this->table[position].key == key) {
+				return; // We've already inserted this entry.
 			}
 			else {
-				this->minType = false;
-			}
-			this->capacity = arrSize - 1;
-			this->heap.reserve(arrSize);
-			this->currentSize = 0;
-
-			int i = arrSize / 2;
-			if (minAtTop) {
-				while (i < 0) {
-					heapifyMinArr(i);
-					--i;
+				// Collision
+				++position;
+				while (position < ((this->size) - 1)) {
+					if (this->table[position].isEmpty()) {
+						this->table[position] = insertion;
+						return; // Entry inserted. 
+					}
+					else if (this->table[position].key == key) {
+						return; // We've already inserted this entry.
+					}
+					else {
+						++position; // The next slot is full. Continue. 
+						continue;
+					}
 				}
+				// If we haven't returned yet, then there aren't any open spaces.
+				// We've now traversed ~O(n) regions, which is pretty uncool.
+				++(this->contains);
+				this->table.push_back(insertion);
 			}
-			else {
-				while (i < 0) {
-					heapifyMaxDel(i);
-					--i;
-				}
-			}
-
 		}
 
-		void print() {
-			std::cout << "[ ";
-			for (auto member : this->heap) {
-				std::cout << member << " ";
-			}
-			std::cout << "]\n";
-		}
+		void remove(const K &key) {
 
-		void insert(T what) {
-			if (this->currentSize >= this->capacity) {
-				std::cout << "\n<ERR: The heap is full, or insertion too big.>\n";
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Replace a bucket in the table vector with a "once used but now empty" bucket object.
+			O(1) if no collision, else possible O(n).
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
+			const Bucket<K, V> successor(-2, "nullptr");
+			int position = hash(key);
+
+			if (this->table[position].key == key) {
+				// The key was placed without any collision.
+				this->table[position] = successor;
+				--(this->contains);
 				return;
 			}
 			else {
-				this->heap.push_back(what);
-				heapifyInsert(currentSize);
-				++(this->currentSize);
+				// Either the key doesn't exist, or the key was placed in collision.
+				++position;
+				while (position < ((this->size) - 1)) {
+					if (this->table[position].isEmpty()) {
+						return; // The key doesn't exist
+					}
+					else if (this->table[position].key == key) {
+						// We've found the key. Delete it.
+						this->table[position] = successor;
+						--(this->contains);
+						return;
+					}
+					else {
+						// There's still more elements that could be key.
+						++position;
+						continue;
+					}
+				}
 			}
+			return; // Value isn't in the table.
 		}
 
-		T extractRoot() {
+		V at(const K &key) {
 
-			if (this->currentSize == 0) {
-				// Tree is empty.
-				throw;
+			/// ------------------------------------------------------------------------------------ ///
+			/*
+			Returns the value at an index in the hash table, K.
+			If the value doesn't exist, returns nullptr.
+			*/
+			/// ------------------------------------------------------------------------------------ ///
+
+			int position = hash(key);
+
+			if (key == this->table[position].key) {
+				// No collision occured with this key.
+				return (this->table[position].value);
 			}
 
 			else {
-				T top = this->heap[0];
-
-				this->heap[0] = this->heap[this->currentSize -1];
-				this->heap.pop_back();
-				--(this->currentSize);
-
-
-				if (this->minType == true) {
-					heapifyMinDel(0);
+				// A collision occured with the key, so let's find it
+				++position;
+				while (position < (this->size) - 1) {
+					if (this->table[position].isEmpty()) {
+						// Key doesn't exist in the table. 
+						std::cout << "Value isn't in table. RETURNS NULLPTR";
+						return nullptr; // -1 : Empty, -2 : Once Empty, -3 : DNE 
+					}
+					else if (this->table[position].key == key) {
+						// Found the key! 
+						return this->table[position].value;
+					}
+					else {
+						// Looking for more keys. 
+						++(position);
+						continue;
+					}
 				}
-
-				else {
-					heapifyMaxDel(0);
-				}
-
-				return top;
+				std::cout << "Value isn't in the table. RETURNING NULLPTR.";
+				return nullptr; // We've reached the end of the table, doesn't exist.
 			}
 		}
-		
-		T getRoot() {
-			if (this->currentSize == 0) {
-				// Tree is empty
-				throw;
+
+			int howManyEntries() {
+				return this->contains;
+			} 
+
+			bool isEmpty() {
+				return (this->contains == 0);
 			}
-			else {
-				return this->heap[0];
+
+			void print() {
+				std::cout << "\n----------------------------\n" << \
+					"Hash Table Starting Size: " << this->size << "\n";
+				for (Bucket<K, V> bucket : this->table) {
+					bucket.print();
+				}
+				std::cout << "----------------------------\n";
 			}
-		}
 };
+
+template <typename V>
+struct Bucket<std::string, V> {
+
+	/// ------------------------------------------------------------------------------------ ///
+	/*
+	Bucket class is a node / entry of the hash table.
+	Specialization where we let K = str.
+	*/
+	/// ------------------------------------------------------------------------------------ ///
+
+	std::string key;
+	V value;
+
+	Bucket(std::string key, V value) {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Normal bucket constructor.
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		this->key = key;
+		this->value = value;
+	}
+
+	Bucket() {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Empty bucket constructor. We assume K is str, v is int.
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		this->key = "**EMPTY";
+		this->value = V(-1);
+	}
+
+	void print() {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Using std::cout, give a formatted view of the key and value of the bucket.
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		std::cout << "Key: " << this->key << " | Value: " << this->value << "\n";
+	}
+
+	bool isEmpty() {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Return true if empty. **EMPTY Means empty since start, ***EMPTY means emptied at some point in execution.
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		return (this->key == "**EMPTY" || this->key == "***EMPTY" );
+	}
+
+};
+
+template <typename V>
+class hashTable<std::string, V>{
+
+	/// ------------------------------------------------------------------------------------ ///
+	/*
+	hashTable class with keys of values V (assumed int.)
+	Enforces linear probing over chaining methods, and uses sub-struct Buckets to contain entries.
+	The goal of a hashtable is to insert, find, and remove at O(1) time like an array.
+
+	We use a hashing function to change a key, K, into an integer index for the table, which allows us to access [hypothetically] ~O(1).
+	Sometimes hash functions do not provide a perfect hash :: h(K) may == h(K2) even if K != k2...
+	... Which is why we use linear probing, and thus worst time is O(n) but very unlikely.
+	*/
+	/// ------------------------------------------------------------------------------------ ///
+
+private:
+	std::vector<Bucket<std::string, V>> table;
+	const int size; // intialized size (aim to keep size around this point for optimal time complexity)
+	int contains; // Actual used values in the table. 
+
+	int hash(std::string key) {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Berstein's hash using binary shift. 
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+		std::hash<std::string> hasher;
+		int index = std::abs((int)hasher(key) % (this->size));
+		return index;
+	}
+
+public:
+
+	hashTable(const int sizeParam) : size(sizeParam), table(sizeParam, Bucket<std::string, V>()) {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Default initialization, initialization list lets us construct const member.
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		this->contains = sizeParam;
+	}
+
+	void insert(const std::string key, const V &value) {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Insert to the bucket. O(1) time if no collision. Else, possible O(n) time.
+		If the bucket is full, we will append to the bucket.
+		This appending will slow down the overall speed of the hash table.
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		const Bucket<std::string, V> insertion(key, value);
+		int position = hash(key);
+
+		if (this->table[position].isEmpty()) {
+			this->table[position] = insertion;
+			return; // No collision, so the insertion is complete at O(1)! 
+		}
+		else if (this->table[position].key == key) {
+			return; // We've already inserted this entry.
+		}
+		else {
+			// Collision
+			++position;
+			while (position < ((this->size) - 1)) {
+				if (this->table[position].isEmpty()) {
+					this->table[position] = insertion;
+					return; // Entry inserted. 
+				}
+				else if (this->table[position].key == key) {
+					return; // We've already inserted this entry.
+				}
+				else {
+					++position; // The next slot is full. Continue. 
+					continue;
+				}
+			}
+			// If we haven't returned yet, then there aren't any open spaces.
+			// We've now traversed ~O(n) regions, which is pretty uncool.
+			++(this->contains);
+			this->table.push_back(insertion);
+		}
+	}
+
+	void remove(const std::string &key) {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Replace a bucket in the table vector with a "once used but now empty" bucket object.
+		O(1) if no collision, else possible O(n).
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		const Bucket<std::string, V> successor("***EMPTY", 0);
+		int position = hash(key);
+
+		if (this->table[position].key == key) {
+			// The key was placed without any collision.
+			this->table[position] = successor;
+			--(this->contains);
+			return;
+		}
+		else {
+			// Either the key doesn't exist, or the key was placed in collision.
+			++position;
+			while (position < ((this->size) - 1)) {
+				if (this->table[position].isEmpty()) {
+					return; // The key doesn't exist
+				}
+				else if (this->table[position].key == key) {
+					// We've found the key. Delete it.
+					this->table[position] = successor;
+					--(this->contains);
+					return;
+				}
+				else {
+					// There's still more elements that could be key.
+					++position;
+					continue;
+				}
+			}
+		}
+		return; // Value isn't in the table.
+	}
+
+	V at(const std::string &key) {
+
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Returns the value at an index in the hash table, K.
+		If the value doesn't exist, returns nullptr.
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+
+		int position = hash(key);
+
+		if (key == this->table[position].key) {
+			// No collision occured with this key.
+			return (this->table[position].value);
+		}
+
+		else {
+			// A collision occured with the key, so let's find it
+			++position;
+			while (position < (this->size) - 1) {
+				if (this->table[position].isEmpty()) {
+					// Key doesn't exist in the table. 
+					std::cout << "Value isn't in table. RETURNS NULLPTR";
+					return nullptr; // ** : Empty, *** : Once Empty, -3 : DNE 
+				}
+				else if (this->table[position].key == key) {
+					// Found the key! 
+					return this->table[position].value;
+				}
+				else {
+					// Looking for more keys. 
+					++(position);
+					continue;
+				}
+			}
+			std::cout << "Value isn't in the table. RETURNING NULLPTR.";
+			return nullptr; // We've reached the end of the table, doesn't exist.
+		}
+	}
+
+	int howManyEntries() {
+		return this->contains;
+	}
+
+	bool isEmpty() {
+		return (this->contains == 0);
+	}
+
+	void print() {
+		std::cout << "\n----------------------------\n" << \
+			"Hash Table Starting Size: " << this->size << "\n";
+		for (Bucket<std::string, V> bucket : this->table) {
+			bucket.print();
+		}
+		std::cout << "----------------------------\n";
+	}
+};
+

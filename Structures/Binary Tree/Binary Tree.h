@@ -8,20 +8,6 @@ using right and left Nodes. Created without any textbook/internet reference. ;) 
 
 //#include "stdafx.h" //You may want to include this if you create a VS PRJ with cmake.
 #include <iostream>
-#include <exception>
-
-struct nullptrProbed : public std::exception {
-
-	/// ------------------------------------------------------------------------------------ ///
-	/*
-	Custom exception. We do not want the program to continue when accessing a nullptr.
-	*/
-	/// ------------------------------------------------------------------------------------ ///
-
-	const char * what() const throw() {
-		return "Can't access this node, probe led to nullptr.";
-	}
-};
 
 template <typename T>
 struct Node {
@@ -186,7 +172,7 @@ private:
 			where->right = where->right->right;
 		}
 		Node<T> *nodeToDel;
-		nodeToDel = current->left;
+		nodeToDel = current->left; // Current always points to the parent of the node with the content we will replace nodetodel with.
 		if (current->left) {
 			// current->left need not exist if we are deleting the root 
 			if (current->left->right) {

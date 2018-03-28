@@ -545,6 +545,13 @@ public:
 	}
 	
 	const binaryTree<T>& operator=(const binaryTree &other) {
+		
+		/// ------------------------------------------------------------------------------------ ///
+		/*
+		Reassignment operator, turns the tree passed into it to other. (DEEP)
+		*/
+		/// ------------------------------------------------------------------------------------ ///
+		
 		if (this != &other) {
 			if (this->root) {
 				this->deleteTree();

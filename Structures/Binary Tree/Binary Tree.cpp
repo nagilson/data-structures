@@ -2,13 +2,7 @@
 #include "Binary Tree.h"
 
 int main() {
-
-	/// ------------------------------------------------------------------------------------ ///
-	/*
-	Gain a few insights on how to use the queue, and see a testable demo that checks the Queue class and assures everything works.
-	*/
-	/// ------------------------------------------------------------------------------------ ///
-
+	
 	binaryTree<int> T;
 	T.insert(4);
 	T.insert(2);

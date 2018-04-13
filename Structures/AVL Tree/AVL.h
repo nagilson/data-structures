@@ -14,7 +14,8 @@ struct Node {
 
 	/// ------------------------------------------------------------------------------------ ///
 	/*
-	A Node struct that contains a left child and a right child note, which would normally be assigned to nullptr.
+	A Node struct that contains a left child, parent, and a right child note, which would normally be assigned to nullptr.
+	Also contains the blanace factor initialized to zero.
 	*/
 	/// ------------------------------------------------------------------------------------ ///
 
@@ -22,7 +23,7 @@ struct Node {
 	Node<T> * left;
 	Node<T> * right;
 	Node<T> * parent;
-	int balance;
+	int height;
 
 	Node<T>(T input) {
 
@@ -36,7 +37,7 @@ struct Node {
 		this->right = nullptr;
 		this->left = nullptr;
 		this->parent = nullptr;
-		this->balance = 0;
+		this->height = 0;
 	}
 
 };
@@ -49,7 +50,7 @@ class AVLTree {
 	This is an implementation of the AVL Tree.
 	The AVL tree is a binary tree that is self-balancing. 
 	The tree uses what are called "rotations" (really tree-realignment, not rotations)
-	... to balance itself automatically.
+	... to balance itself automatically in O(lgn) time operations.
 
 	This assures O(lgn) time instead of O(n) time, which is the goal of a binary tree.
 	We do this by assuring that a height / balance factor is always not greater than +-1. 
@@ -60,6 +61,99 @@ private:
 
 	Node<T> * root;
 	int length;
+
+	int getBalanceFactor(Node<T> *&pos) {
+		if (pos->right && pos->left) {
+			return (pos->left->height - pos->right->height);
+		}
+		else if (pos->right) {
+			return (-1 - pos->right->height);
+		}
+		else if (pos->left) {
+			return (pos->left->height + 1);
+		}
+		else {
+			return 0;
+		}
+	}
+
+	void validateAVL(Node<T> *&insLoc) {
+		// For all nodes up to the root
+		int balance;
+		Node<T> *current = insLoc;
+		while (current->parent) {
+			balance = getBalanceFactor(current);
+			if (balance >= 2) {
+				if (current->left->left) { // Subtree goes cur->left->left
+					;
+				}
+				else { // Subtree goes cur->left->right
+					;
+				}
+			}
+			else if (balance <= -2) {
+				if (current->right->right) { // Subtree goes cur->right->right
+					;
+				}
+				else { // Subtree goes cur->right->left
+					;
+				}
+			}
+			current = current->parent;
+		}
+			
+		// Now we manage the root's BF.
+		balance = getBalanceFactor(current);
+		if (balance >= 2) {
+			;
+		}
+		else if (balance <= -2) {
+			;
+		}
+	}
+
+	void updateHeightPostInsertion(Node<T> *&insLoc) {
+
+
+
+		Node<T> *current = insLoc;
+		//Update the heights of every node until the root.
+		while (current->parent) {
+			if (current->parent->left && current->parent->right) {
+				current->parent->height = [&](int leftH, int rightH) {
+					if (leftH >= rightH) {
+						return leftH + 1;
+					}
+					else {
+						return rightH + 1;
+					}
+				}(current->parent->left->height, current->parent->right->height);
+			}
+			else {
+				current->parent->height = current->height + 1;
+			}
+			current = current->parent;
+		}
+		// We had a while loop update for all parents, now we must update the root.
+		if (current->left && current->right) {
+			current->height = [&](int leftH, int rightH) { // lambda max()
+				if (leftH >= rightH) {
+					return leftH + 1;
+				}
+				else {
+					return rightH + 1;
+				}
+			}(current->left->height, current->right->height);
+		}
+		else if(current->left){
+			current->height = current->left->height + 1;
+		}
+		else if (current->right) {
+			current->height = current->right->height;
+		}
+	}
+
+
 
 	void deletePartition(Node<T> *& where) {
 
@@ -107,7 +201,6 @@ private:
 		Return the pointer to said node containing what.
 		*/
 		/// ------------------------------------------------------------------------------------ ///
-
 
 		if (where->data == what) {
 			return where;
@@ -268,7 +361,7 @@ private:
 			copyTreeRoot = new Node<T>(otherRoot->data);
 			copyTreeRoot->left = otherRoot->left;
 			copyTreeRoot->right = otherRoot->right;
-			copyTreeRoot->balance = otherRoot->balance;
+			copyTreeRoot->height = otherRoot->height;
 			copyTreeRoot->parent = otherRoot->parent;
 			copyTree(copyTreeRoot->left, otherRoot->left);
 			copyTree(copyTreeRoot->right, otherRoot->right);
@@ -389,6 +482,16 @@ public:
 					continue;
 				}
 			} while (true);
+
+			if (current->left) {
+				validateAVL(current->left);
+				updateHeightPostInsertion(current->left);
+			}
+			else if (current->right) {
+				validateAVL(current->right);
+				updateHeightPostInsertion(current->right);
+			}
+			
 		}
 	}
 

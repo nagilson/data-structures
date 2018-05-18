@@ -67,7 +67,7 @@ private:
 			return (pos->left->height - pos->right->height);
 		}
 		else if (pos->right) {
-			return (-1 - pos->right->height);
+			return (-1 - pos->right->height); 
 		}
 		else if (pos->left) {
 			return (pos->left->height + 1);
@@ -75,6 +75,56 @@ private:
 		else {
 			return 0;
 		}
+	}
+
+	void balanceLeft(Node<T> *&pos) {
+		Node<T> *RootOrigin = pos;
+		if (pos->parent->left) {
+			if (pos->parent->left->data == pos->data) {
+				// pos is a left child
+				pos->parent->left = pos->right;
+			}
+		}
+		else if (pos->parent->right) {
+			// pos is a right child
+			pos->parent->right = pos->right;
+		}
+		else {
+			// pos is the root
+			this->root = pos->right;
+			pos->right->parent = nullptr;
+		}
+		Node<T> *MovedLeftChild = nullptr;
+		if (RootOrigin->right->left) {
+			MovedLeftChild = RootOrigin->right->left;
+		}
+		RootOrigin->right->left = RootOrigin;
+		RootOrigin->right = MovedLeftChild;
+	}
+
+	void balanceRight(Node<T> *&pos) {
+		Node<T> *RootOrigin = pos;
+		if (pos->parent->left) {
+			if (pos->parent->left->data == pos->data) {
+				// pos is a left child
+				pos->parent->left = pos->right;
+			}
+		}
+		else if (pos->parent->right) {
+			// pos is a right child
+			pos->parent->right = pos->right;
+		}
+		else {
+			// pos is the root
+			this->root = pos->left;
+			pos->left->parent = nullptr;
+		}
+		Node<T> *MovedLeftChild = nullptr;
+		if (RootOrigin->left->right) {
+			MovedLeftChild = RootOrigin->left->right;
+		}
+		RootOrigin->left->right = RootOrigin;
+		RootOrigin->left = MovedLeftChild;
 	}
 
 	void validateAVL(Node<T> *&insLoc) {
@@ -85,18 +135,20 @@ private:
 			balance = getBalanceFactor(current);
 			if (balance >= 2) {
 				if (current->left->left) { // Subtree goes cur->left->left
-					;
+					balanceRight(current);
 				}
 				else { // Subtree goes cur->left->right
-					;
+					balanceRight(current->left);
+					balanceLeft(current);
 				}
 			}
 			else if (balance <= -2) {
 				if (current->right->right) { // Subtree goes cur->right->right
-					;
+					balanceLeft(current);
 				}
 				else { // Subtree goes cur->right->left
-					;
+					balanceRight(current->right);
+					balanceLeft(current);
 				}
 			}
 			current = current->parent;

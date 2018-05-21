@@ -77,17 +77,44 @@ private:
 		}
 	}
 
+	void fixHeight(Node<T> *&where) {
+		where->height = 0;
+		if (where->right && where->left) {
+			where->height = [&](int leftH, int rightH) {
+				if (leftH >= rightH) {
+					return leftH + 1;
+				}
+				else {
+					return rightH + 1;
+				}
+			}(where->left->height, where->right->height);
+		}
+		else if(where->right){
+			where->height = where->right->height + 1;
+		}
+		else if (where->left) {
+			where->height = where->left->height + 1;
+		}
+		else {
+			; 
+		}
+	}
+
 	void balanceLeft(Node<T> *&pos) {
 		Node<T> *RootOrigin = pos;
 		if (pos->parent->left) {
 			if (pos->parent->left->data == pos->data) {
 				// pos is a left child
 				pos->parent->left = pos->right;
+				pos->right->parent = pos->parent;
+				pos->parent = pos->right;
 			}
 		}
 		else if (pos->parent->right) {
 			// pos is a right child
 			pos->parent->right = pos->right;
+			pos->right->parent = pos->parent;
+			pos->parent = pos->right;
 		}
 		else {
 			// pos is the root
@@ -100,6 +127,11 @@ private:
 		}
 		RootOrigin->right->left = RootOrigin;
 		RootOrigin->right = MovedLeftChild;
+
+		
+		fixHeight();
+		fixHeight();
+		// All other tree heights do not change!! 
 	}
 
 	void balanceRight(Node<T> *&pos) {
@@ -125,42 +157,37 @@ private:
 		}
 		RootOrigin->left->right = RootOrigin;
 		RootOrigin->left = MovedLeftChild;
+		fixHeight();
+		fixHeight();
+		// All other tree heights do not change! 
 	}
 
-	void validateAVL(Node<T> *&insLoc) {
-		// For all nodes up to the root
+	void validateAVL(Node<T> *&where) {
+
+
+		// For all nodes up to the root, please apply this function.
 		int balance;
-		Node<T> *current = insLoc;
-		while (current->parent) {
-			balance = getBalanceFactor(current);
-			if (balance >= 2) {
-				if (current->left->left) { // Subtree goes cur->left->left
-					balanceRight(current);
-				}
-				else { // Subtree goes cur->left->right
-					balanceRight(current->left);
-					balanceLeft(current);
-				}
-			}
-			else if (balance <= -2) {
-				if (current->right->right) { // Subtree goes cur->right->right
-					balanceLeft(current);
-				}
-				else { // Subtree goes cur->right->left
-					balanceRight(current->right);
-					balanceLeft(current);
-				}
-			}
-			current = current->parent;
-		}
-			
-		// Now we manage the root's BF.
+		Node<T> *current = where;
 		balance = getBalanceFactor(current);
-		if (balance >= 2) {
-			;
+		if (balance >= 2) { 
+			// The tree is imbalanced to the left partition
+			if (current->left->data < current->data) { // Subtree imbalance goes cur->left->left
+				balanceRight(current);
+			}
+			else { // Subtree imbalance goes cur->left->right
+				balanceRight(current->left);
+				balanceLeft(current);
+			}
 		}
 		else if (balance <= -2) {
-			;
+			// The tree is imbalanced to the right partition
+			if (current->right->data > current->data) { // Subtree imbalance goes cur->right->right
+				balanceLeft(current);
+			}
+			else { // Subtree imbalance goes cur->right->left
+				balanceRight(current->right);
+				balanceLeft(current);
+			}
 		}
 	}
 
@@ -535,12 +562,26 @@ public:
 				}
 			} while (true);
 
+
+			Node<T> *balanceRegion = current;
 			if (current->left) {
-				validateAVL(current->left);
 				updateHeightPostInsertion(current->left);
+				balanceRegion = balanceRegion->left;
+				while (balanceRegion->parent) {
+					validateAVL(balanceRegion);
+					balanceRegion = balanceRegion->parent;
+				}
+				validateAVL(balanceRegion); // validate the root is balanced too! 
+				updateHeightPostInsertion(current->left); 
 			}
 			else if (current->right) {
-				validateAVL(current->right);
+				updateHeightPostInsertion(current->left);
+				balanceRegion = balanceRegion->right;
+				while (balanceRegion->parent) {
+					validateAVL(balanceRegion);
+					balanceRegion = balanceRegion->parent;
+				}
+				validateAVL(balanceRegion); // validate the root is balanced too! 
 				updateHeightPostInsertion(current->right);
 			}
 			

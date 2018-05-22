@@ -101,65 +101,71 @@ private:
 	}
 
 	void balanceLeft(Node<T> *&pos) {
-		Node<T> *RootOrigin = pos;
+		Node<T> *origin = pos;
 		if (pos->parent->left) {
 			if (pos->parent->left->data == pos->data) {
 				// pos is a left child
 				pos->parent->left = pos->right;
-				pos->right->parent = pos->parent;
-				pos->parent = pos->right;
+				origin->right->parent = origin->parent;
+				origin->parent = origin->right;
 			}
 		}
 		else if (pos->parent->right) {
 			// pos is a right child
 			pos->parent->right = pos->right;
-			pos->right->parent = pos->parent;
-			pos->parent = pos->right;
+			origin->right->parent = origin->parent;
+			origin->parent = origin->right;
 		}
 		else {
 			// pos is the root
 			this->root = pos->right;
-			pos->right->parent = nullptr;
+			origin->right->parent = nullptr;
 		}
 		Node<T> *MovedLeftChild = nullptr;
-		if (RootOrigin->right->left) {
-			MovedLeftChild = RootOrigin->right->left;
+		if (origin->right->left) {
+			MovedLeftChild = pos->right->left;
 		}
-		RootOrigin->right->left = RootOrigin;
-		RootOrigin->right = MovedLeftChild;
-
+		origin->right->left = origin;
+		origin->right->parent = origin;
+		origin->right = MovedLeftChild;
 		
-		fixHeight();
-		fixHeight();
+		fixHeight(origin);
+		fixHeight(origin->parent);
 		// All other tree heights do not change!! 
 	}
 
 	void balanceRight(Node<T> *&pos) {
-		Node<T> *RootOrigin = pos;
+		Node<T> *origin = pos;
 		if (pos->parent->left) {
 			if (pos->parent->left->data == pos->data) {
 				// pos is a left child
-				pos->parent->left = pos->right;
+				pos->parent->left = pos->left;
+				origin->left->parent = origin->parent;
+				origin->parent = origin->left;
 			}
 		}
 		else if (pos->parent->right) {
 			// pos is a right child
-			pos->parent->right = pos->right;
+			pos->parent->right = pos->left;
+			origin->left->parent = origin->parent;
+			origin->parent = origin->left;
 		}
 		else {
 			// pos is the root
 			this->root = pos->left;
-			pos->left->parent = nullptr;
+			origin->left->parent = nullptr;
 		}
 		Node<T> *MovedLeftChild = nullptr;
-		if (RootOrigin->left->right) {
-			MovedLeftChild = RootOrigin->left->right;
+		if (origin->left->right) {
+			MovedLeftChild = origin->left->right;
 		}
-		RootOrigin->left->right = RootOrigin;
-		RootOrigin->left = MovedLeftChild;
-		fixHeight();
-		fixHeight();
-		// All other tree heights do not change! 
+		origin->left->right = origin;
+		origin->left->parent = origin;
+		origin->left = MovedLeftChild;
+		
+		fixHeight(origin);
+		fixHeight(origin->parent);
+		// All other tree heights do not change!! 
 	}
 
 	void validateAVL(Node<T> *&where) {
@@ -171,21 +177,21 @@ private:
 		balance = getBalanceFactor(current);
 		if (balance >= 2) { 
 			// The tree is imbalanced to the left partition
-			if (current->left->data < current->data) { // Subtree imbalance goes cur->left->left
+			if (getBalanceFactor(current->left) != 0) { // Subtree imbalance goes cur->left->right
+				balanceLeft(current->left);
 				balanceRight(current);
 			}
-			else { // Subtree imbalance goes cur->left->right
-				balanceRight(current->left);
-				balanceLeft(current);
+			else { // Subtree imbalance goes cur->left->left
+				balanceRight(current);
 			}
 		}
 		else if (balance <= -2) {
 			// The tree is imbalanced to the right partition
-			if (current->right->data > current->data) { // Subtree imbalance goes cur->right->right
+			if (getBalanceFactor(current->right) != 0){ // Subtree imbalance goes cur->right->left
+				balanceRight(current->right);
 				balanceLeft(current);
 			}
-			else { // Subtree imbalance goes cur->right->left
-				balanceRight(current->right);
+			else { // Subtree imbalance goes cur->right->right
 				balanceLeft(current);
 			}
 		}
@@ -562,7 +568,6 @@ public:
 				}
 			} while (true);
 
-
 			Node<T> *balanceRegion = current;
 			if (current->left) {
 				updateHeightPostInsertion(current->left);
@@ -575,7 +580,7 @@ public:
 				updateHeightPostInsertion(current->left); 
 			}
 			else if (current->right) {
-				updateHeightPostInsertion(current->left);
+				updateHeightPostInsertion(current->right);
 				balanceRegion = balanceRegion->right;
 				while (balanceRegion->parent) {
 					validateAVL(balanceRegion);

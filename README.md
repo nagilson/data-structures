@@ -1,5 +1,5 @@
 # Usage
-Original classes were made within a VS project, thus the use of "stdafx.h" in comments. Compiling with VS is not necessary, however, you can choose to test the structures in VS through cmake. 
+Original classes were made within a VS project, thus the use of "stdafx.h" in comments. Compiling with VS is not necessary. I plan on adding a CMake file soon.
 Classes incusion should be relatively simple / rudimentary, and each main shows how to use each class.
 
 I decided to include the implementation in .h as these are all templates. .tpp files are not supposed well across all compilers. 

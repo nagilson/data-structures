@@ -7,7 +7,6 @@ Node<T> values with pointers and a data type.
 */
 /// ------------------------------------------------------------------------------------ ///
 
-// #include "stdafx.h" // You may want to include this if you create a VS PRJ with cmake.
 #include <iostream>
 #include <exception>
 

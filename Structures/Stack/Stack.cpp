@@ -36,7 +36,7 @@ int main()
 	S.push(4);
 	std::cout << "\nOf course, we can push 4 back to the empty stack and then print the stack: "; S.print();
 	std::cout << "\n";
-	std::system("pause");
+	std::cin.get();
 
     return 0;
 }

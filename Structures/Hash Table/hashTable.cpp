@@ -45,7 +45,7 @@ int main()
 	H2.print();
 	std::cout << "\n";
 
-	std::system("pause");
+	continuePrompt();
     return 0;
 }
 

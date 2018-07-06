@@ -1,4 +1,3 @@
-﻿//#include "stdafx.h" //You may want to include this if you create a VS PRJ with cmake.
 #include "BinaryTree.h"
 
 int main() {

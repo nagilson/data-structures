@@ -6,7 +6,6 @@ using right and left Nodes. Created without any textbook/internet reference. ;) 
 */
 /// ------------------------------------------------------------------------------------ ///
 
-//#include "stdafx.h" //You may want to include this if you create a VS PRJ with cmake.
 #include <iostream>
 
 template <typename T>

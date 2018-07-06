@@ -1,4 +1,3 @@
-//#include "stdafx.h" // You may want to include this if you create a VS PRJ with cmake.
 #include "linkedList.h"
 
 int main()
@@ -33,6 +32,6 @@ int main()
 	std::cout << "\nAssignment of list to another, the second list has turned into the original: ";
 	List.print();
 	std::cout << "\n\n";
-	std::system("pause");
+	std::cin.get();
 	return 0;
 }

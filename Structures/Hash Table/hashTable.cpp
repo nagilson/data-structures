@@ -1,6 +1,3 @@
-// Showcase of using the hash table:
-
-//#include "stdafx.h"
 #include <iostream>
 #include <string>
 #include <vector>

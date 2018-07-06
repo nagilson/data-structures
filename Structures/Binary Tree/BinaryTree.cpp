@@ -44,6 +44,6 @@ int main() {
 	std::cout << "... and, to validate the deletion of the tree copy: ";
 	T2.print();
 	std::cout << "\n";
-	system("pause");
+	std::cin.get();
 	return 0;
 }

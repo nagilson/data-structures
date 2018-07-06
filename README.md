@@ -10,7 +10,7 @@ The finished collection includes:
 * Heap
 * Hash Table
 
-Each class contains considerable documentation, explaining many algorithms, their purpose, and their efficiencies. 
+Each class contains considerable documentation, explaining many algorithms, their purpose, and their efficiencies; the library's main function is to provide reference to students who want to thoroughly explore data structures commonly found in computer science courses. 
 
 ## Documentation
 

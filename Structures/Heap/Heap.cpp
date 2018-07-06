@@ -1,4 +1,3 @@
-#include "stdafx.h" //You may want to include this if you create a VS PRJ with cmake.
 #include "Heap.h"
 
 void continuePrompt();
@@ -57,7 +56,7 @@ int main() {
 	std::cout << "\nMinima Tree Initialized via Array: "; HL.print();
 	std::cout << "Maxima Tree Initialized via Array: "; HLMax.print();
 	std::cout << "\n";
-	std::system("pause");
+	continuePrompt();
 
 	return 0;
 }

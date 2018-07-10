@@ -47,7 +47,7 @@ class binaryTree {
 	The tree begins at a height 0 with node root and then continues on with values assigned to nullptr.
 
 	The name of the binary tree is quite revealing. A BST allows us to execute in the same
-	... spacial time execution of a binary search, ~ O(lg(n)). This is because we know the comparisons between numbers
+	... time of a binary search, ~ O(lg(n)). This is because we know the comparisons (< or >) between numbers
 	... before the search.
 
 	There are many types of trees, that are not binary, and some trees like heaps are made from this structure.

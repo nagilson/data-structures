@@ -300,7 +300,7 @@ class Heap{
 
 			/// ------------------------------------------------------------------------------------ ///
 			/*
-			Print the heap in an array / list liek representation.
+			Print the heap in an array / list like representation.
 			*/
 			/// ------------------------------------------------------------------------------------ ///
 

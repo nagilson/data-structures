@@ -18,5 +18,5 @@ Using each class is simple. Each folder contains a .cpp file, and a .h file. Run
 
 Use whichever compiler you'd like, but if you'd like to simplify the process you can use this: 
 
-`g++ -std=c++11 file.cpp -o file.exe` 
+`g++ -Wall -Wextra -pedantic -ggdb3 -std=c++14 file.cpp -o file.exe` 
 `./file.exe` and replace _file_ with the corresponding file name. 

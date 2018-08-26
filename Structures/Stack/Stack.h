@@ -9,6 +9,7 @@ upon a linked list like structure using nodes.
 
 #include <iostream>
 #include <exception>
+#include <memory>
 
 struct nullptrProbed : public std::exception {
 
@@ -34,7 +35,7 @@ struct Node {
 	/// ------------------------------------------------------------------------------------ ///
 
 	T data;
-	Node<T> *next;
+	std::shared_ptr<Node<T>> next;
 
 };
 
@@ -55,7 +56,7 @@ class Stack {
 
 private:
 
-	Node<T> *head;
+	std::shared_ptr<Node<T>> head;
 	int length;
 
 public:
@@ -80,7 +81,7 @@ public:
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
-		Node<T> *entry = new Node<T>;
+		std::shared_ptr<Node<T>> entry = std::make_shared<Node<T>>();
 		entry->data = value;
 		if (!(this->head)) {
 			entry->next = nullptr;
@@ -104,7 +105,7 @@ public:
 			throw nullptrProbed(); // Can't access this value of the stack, stack probe led to nullptr
 		}
 		else {
-			Node<T> *top = this->head;
+			std::shared_ptr<Node<T>> top = this->head;
 			if (!(this->head->next == nullptr)) {
 				this->head = this->head->next;
 			}
@@ -112,7 +113,6 @@ public:
 				this->head = nullptr;
 			}
 			T value = top->data;
-			delete top;
 			--(this->length);
 			return value;
 		}
@@ -147,7 +147,7 @@ public:
 		}
 		else {
 			std::cout << "[";
-			Node<T> *current = this->head;
+			std::shared_ptr<Node<T>> current = this->head;
 			do {
 				std::cout << current->data;
 				current = current->next;
@@ -161,9 +161,11 @@ public:
 			std::cout << "]";
 		}
 	}
+
 	bool isEmpty() {
 		return((this->head == nullptr));
 	}
+
 	int& getLength() {
 		return this->length;
 	}

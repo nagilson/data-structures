@@ -25,11 +25,11 @@ int main()
 	List2.append(6);
 	std::cout << "\nHere, we showcase the creation of a second list. \nThis list uses the insert method to insert 2 at the 2nd (i = 1) element: ";
 	List2.print();
-	std::cout << "\nList after calling deleteNode at 0: ";
+	std::cout << "\n\nList after calling deleteNode at 0: ";
 	List2.deleteNode(0);
 	List2.print();
 	List2 = List;
-	std::cout << "\nAssignment of list to another, the second list has turned into the original: ";
+	std::cout << "\n\nAssignment of list to another, the second list has turned into the original: ";
 	List.print();
 	std::cout << "\n\n";
 	std::cin.get();

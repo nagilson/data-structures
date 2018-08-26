@@ -9,6 +9,7 @@ Node<T> values with pointers and a data type.
 
 #include <iostream>
 #include <exception>
+#include <memory>
 
 struct nullptrProbed : public std::exception {
 
@@ -34,7 +35,7 @@ struct Node {
 	/// ------------------------------------------------------------------------------------ ///
 
 	T data;
-	Node<T> *next;
+	std::shared_ptr<Node<T>> next;
 
 };
 
@@ -54,8 +55,8 @@ class linkedList {
 
 private:
 
-	Node<T> *head;
-	Node<T> *tail;
+	std::shared_ptr<Node<T>> head;
+	std::shared_ptr<Node<T>> tail;
 	int length;
 
 public:
@@ -94,7 +95,7 @@ public:
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
-		this->head = new Node<T>();
+		this->head = std::make_shared<Node<T>>();
 		this->head->next = nullptr;
 		this->head->data = value;
 		this->tail = this->head;
@@ -109,11 +110,8 @@ public:
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
-		Node<T> *kill;
 		while (this->head != nullptr) {
-			kill = this->head;
 			this->head = this->head->next;
-			delete kill;
 		}
 		this->tail = nullptr;
 		this->length = 0;
@@ -129,7 +127,7 @@ public:
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
-		Node<T> *current;
+		std::shared_ptr<Node<T>> current;
 		auto i = 0;
 		if (!(this->head == nullptr)) {
 			current = this->head;
@@ -138,6 +136,7 @@ public:
 			std::cout << "nullptr\n";
 			return;
 		}
+
 		if ((current != nullptr)) {
 			while (!(current->next == nullptr) && i != where) {
 				current = current->next;
@@ -148,21 +147,16 @@ public:
 			}
 			else {
 				if (where + 1 == this->length) {
-					Node<T> *kill = this->tail;
 					this->tail = current;
 					--(this->length);
-					delete kill;
 				}
 				else if (where == 0) {
-					Node<T> *kill = this->head;
 					this->head = this->head->next;
 					--(this->length);
-					delete kill;
 				}
 				else {
 					current->next = current->next->next;
 					--(this->length);
-					delete (current->next);
 				}
 			}
 		}
@@ -181,7 +175,7 @@ public:
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
-		Node<T> *current;
+		std::shared_ptr<Node<T>> current;
 		if (!(this->head == nullptr)) {
 			current = this->head;
 		}
@@ -205,7 +199,7 @@ public:
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
-		Node<T> *end = new Node<T>();
+		std::shared_ptr<Node<T>> end = std::make_shared<Node<T>>();
 		end->data = what;
 		end->next = nullptr;
 		if (this->length != 0) {
@@ -232,8 +226,8 @@ public:
 			this->length = 0;
 		}
 		else {
-			Node<T> *where = other.head;
-			this->head = new Node<T>;
+			std::shared_ptr<Node<T>> where = other.head;
+			this->head = std::make_shared<Node<T>>();
 			this->head->data = other.head->data;
 			this->head->next = other.head->next;
 			while (!(where->next == nullptr)) {
@@ -253,7 +247,7 @@ public:
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
-		Node<T> *current;
+		std::shared_ptr<Node<T>> current;
 		int i = 0;
 		if (!(this->head == nullptr)) {
 			current = this->head;
@@ -266,7 +260,7 @@ public:
 			current = current->next;
 			++i;
 		}
-		Node<T> *newNode = new Node<T>();
+		std::shared_ptr<Node<T>> newNode = std::make_shared<Node<T>>();
 		newNode->data = value;
 		newNode->next = current->next;
 		if (where == this->length) {
@@ -331,7 +325,7 @@ public:
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
-		Node<T> *current = this->head;
+		std::shared_ptr<Node<T>> current = this->head;
 		int loc = 0;
 		while (current->next != nullptr && loc != i) {
 			current = current->next;

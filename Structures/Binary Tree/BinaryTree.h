@@ -7,6 +7,7 @@ using right and left Nodes. Created without any textbook/internet reference. ;) 
 /// ------------------------------------------------------------------------------------ ///
 
 #include <iostream>
+#include <memory>
 
 template <typename T>
 struct Node {
@@ -18,8 +19,8 @@ struct Node {
 	/// ------------------------------------------------------------------------------------ ///
 
 	T data;
-	Node<T> * left;
-	Node<T> * right;
+	std::shared_ptr<Node<T>> left;
+	std::shared_ptr<Node<T>> right;
 
 	Node<T>(T input) {
 
@@ -57,10 +58,10 @@ class binaryTree {
 
 private:
 
-	Node<T> * root;
+	std::shared_ptr<Node<T>> root;
 	int length;
 
-	void deletePartition(Node<T> *& where) {
+	void deletePartition(std::shared_ptr<Node<T>> &where) {
 
 		/// ------------------------------------------------------------------------------------ ///
 		/*
@@ -75,12 +76,11 @@ private:
 		if (where->right) {
 			deletePartition(where->right);
 		}
-		delete where;
 		--(this->length);
 		return;
 	}
 
-	void printPartition(Node<T> *& where) {
+	void printPartition(std::shared_ptr<Node<T>> &where) {
 
 		/// ------------------------------------------------------------------------------------ ///
 		/*
@@ -98,11 +98,11 @@ private:
 
 	}
 
-	Node<T> * findNode(Node<T>* &where, T &what) {
+	std::shared_ptr<Node<T>> findNode(std::shared_ptr<Node<T>> &where, T &what) {
 
 		/// ------------------------------------------------------------------------------------ ///
 		/*
-		Find the node starting from a parent where, containing content T what. 
+		Find the node starting from a parent where, containing content T what.
 		Return the pointer to said node containing what.
 		*/
 		/// ------------------------------------------------------------------------------------ ///
@@ -131,18 +131,18 @@ private:
 		}
 	}
 
-	T prepareSuccessor(Node<T>* &where) {
+	T prepareSuccessor(std::shared_ptr<Node<T>> &where) {
 
 		/// ------------------------------------------------------------------------------------ ///
 		/*
 		Find the leftmost node of the right subtree at where, and return its content.
 		The leftmost RST node can only have a right child, and MUST follow the properties of where.
 
-		A right subtree will always exist at where because this is only called when a deletion node 
-		... has two children. 
+		A right subtree will always exist at where because this is only called when a deletion node
+		... has two children.
 
-		This function maintains all of the pointers needed, because it DELETES the node with 
-		... the content we want to replace where with. 
+		This function maintains all of the pointers needed, because it DELETES the node with
+		... the content we want to replace where with.
 
 		In some scenarios, it may be better to randomly select the rightmost in the left subtree instead.
 		(We want a balanced tree to preserve O(lg(n)).)
@@ -150,7 +150,7 @@ private:
 		/// ------------------------------------------------------------------------------------ ///
 
 
-		Node<T> *current = where->right;
+		std::shared_ptr<Node<T>> current = where->right;
 		// Find the leftmost child in the right subtree
 		// ... that is the successor.
 		if (current->left) {
@@ -170,19 +170,17 @@ private:
 		if (where->right->right) {
 			where->right = where->right->right;
 		}
-		Node<T> *nodeToDel;
-		nodeToDel = current->left; // Current always points to the parent of the node with the content we will replace nodetodel with.
+
 		if (current->left) {
 			// current->left need not exist if we are deleting the root 
 			if (current->left->right) {
 				current->left = current->left->right;
 			}
 		}
-		delete nodeToDel;
 		return value;
 	}
 
-	Node<T>* findPriorNode(T what) {
+	std::shared_ptr<Node<T>> findPriorNode(T what) {
 
 		/// ------------------------------------------------------------------------------------ ///
 		/*
@@ -191,7 +189,7 @@ private:
 		/// ------------------------------------------------------------------------------------ ///
 
 
-		Node<T> *current = this->root;
+		std::shared_ptr<Node<T>> current = this->root;
 		do {
 			if (what > current->data) {
 				if (current->right) {
@@ -222,25 +220,25 @@ private:
 				}
 			}
 			else {
-				; // You should NEVER get here.
+				; // program should never get here
 			}
 		} while (true);
 	}
 
-	void deleteNode(T what){
+	void deleteNode(T what) {
 
 		/// ------------------------------------------------------------------------------------ ///
 		/*
-		Remove a node in the tree that is not the root. 
+		Remove a node in the tree that is not the root.
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
 		// Find the node BEFORE the node we need to delete.
 		// (Why? we have to set that node's pointer unless there are 2 children)
-		Node<T> *prior = findPriorNode(what);
-		
+		std::shared_ptr<Node<T>> prior = findPriorNode(what);
+
 		if (prior == nullptr) {
-		// The node to erase doesn't exist.
+			// The node to erase doesn't exist.
 			return;
 		}
 
@@ -248,7 +246,7 @@ private:
 			// We've got to erase the node. 
 
 			// Find the location of the node to delete.
-			Node<T> *nodeToDel;
+			std::shared_ptr<Node<T>> nodeToDel;
 			bool left = false;
 
 			if (prior->left) {
@@ -264,9 +262,9 @@ private:
 				nodeToDel = prior->right;
 			}
 
-		// Managing Children, then deletion process
+			// Managing Children, then deletion process
 			if (!(nodeToDel->left || nodeToDel->right)) {
-			// The Node has no children...
+				// The Node has no children...
 				// First, we set the pointer to our erased node to nullptr.
 				if (left) {
 					prior->left = nullptr;
@@ -274,30 +272,26 @@ private:
 				else {
 					prior->right = nullptr;
 				}
-				delete nodeToDel;
 			}
-
 			else if ((nodeToDel->left && nodeToDel->right)) {
-			// The node to erase has 2 children...
+				// The node to erase has 2 children...
 				T successor = prepareSuccessor(nodeToDel);
 				// prepareSuccessor automatically sets the
 				// successorsPrior pointer to successor to nullptr.
 				nodeToDel->data = successor;
 			}
 			else if (nodeToDel->left) {
-			// The node has 1 child, and it's to the left.
+				// The node has 1 child, and it's to the left.
 				prior->right = nodeToDel->left;
-				delete nodeToDel;
 			}
 			else {
-			// The node has 1 child, and it's to the right.
+				// The node has 1 child, and it's to the right.
 				prior->left = nodeToDel->right;
-				delete nodeToDel;
 			}
 		}
 	}
 
-	void copyTree(Node<T>* &copyTreeRoot, Node<T>* otherRoot) {
+	void copyTree(std::shared_ptr<Node<T>> &copyTreeRoot, std::shared_ptr< Node<T>> otherRoot) {
 
 		/// ------------------------------------------------------------------------------------ ///
 		/*
@@ -309,7 +303,7 @@ private:
 			copyTreeRoot = nullptr;
 		}
 		else {
-			copyTreeRoot = new Node<T>(otherRoot->data);
+			copyTreeRoot = std::make_shared<Node<T>>(otherRoot->data);
 			copyTreeRoot->left = otherRoot->left;
 			copyTreeRoot->right = otherRoot->right;
 			copyTree(copyTreeRoot->left, otherRoot->left);
@@ -336,7 +330,6 @@ public:
 			std::cout << "\n---\nRoot: " << (this->root->data);
 			std::cout << "\nLength: " << this->length;
 			std::cout << "\n< ";
-			int len = this->length;
 			printPartition(this->root);
 			std::cout << ">\n---\n\n";
 		}
@@ -360,7 +353,6 @@ public:
 			// Generic Node deletion requires a prior node...
 			if (!(root->left || root->right)) {
 				// No Children
-				delete this->root;
 				--(this->length);
 				this->root = nullptr;
 			}
@@ -371,15 +363,13 @@ public:
 			}
 			else if (this->root->left) {
 				// Root has 1 child to the left.
-				Node<T> *nodeToDel = this->root;
+				std::shared_ptr<Node<T>> nodeToDel = this->root;
 				this->root = this->root->left;
-				delete nodeToDel;
 			}
 			else {
 				// Root has 1 child to the right.
-				Node<T> *nodeToDel = this->root;
+				std::shared_ptr<Node<T>> nodeToDel = this->root;
 				this->root = this->root->right;
-				delete nodeToDel;
 			}
 			--(this->length);
 		}
@@ -394,18 +384,18 @@ public:
 
 		/// ------------------------------------------------------------------------------------ ///
 		/*
-		Add a node with content data into the tree at the proper position. 
+		Add a node with content data into the tree at the proper position.
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
 
-		Node<T> *next = new Node<T>(data);
-		if(this->root == nullptr){
+		std::shared_ptr<Node<T>> next = std::make_shared<Node<T>>(data);
+		if (this->root == nullptr) {
 			this->root = next;
 			++(this->length);
 		}
 		else {
-			Node<T> *current = this->root;
+			std::shared_ptr<Node<T>> current = this->root;
 			do {
 				if (next->data == current->data) {
 					break; // No repeats in this binary tree. 
@@ -454,7 +444,7 @@ public:
 		return this->length;
 	}
 
-	Node<T>* find(T what) {
+	std::shared_ptr<Node<T>> find(T what) {
 
 		/// ------------------------------------------------------------------------------------ ///
 		/*
@@ -526,30 +516,32 @@ public:
 		}
 		else {
 			copyTree(this->root, (other.getRoot()));
+			this->length = other.getLength();
 		}
 	}
-	
+
 	const binaryTree<T>& operator=(const binaryTree &other) {
-		
+
 		/// ------------------------------------------------------------------------------------ ///
 		/*
 		Reassignment operator, turns the tree passed into it to other. (DEEP)
 		*/
 		/// ------------------------------------------------------------------------------------ ///
-		
+
 		if (this != &other) {
 			if (this->root) {
 				this->deleteTree();
 			}
 			if (!(other.root)) {
 				this->root = nullptr;
+				this->length = 0;
 			}
 			else {
 				copyTree(this->root, (other.root));
 			}
 		}
+		this->length = other.length;
 		return *this;
 	}
 
 };
-

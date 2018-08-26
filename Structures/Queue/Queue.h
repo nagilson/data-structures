@@ -8,6 +8,7 @@ upon a linked list like structure using nodes.
 //#include "stdafx.h" // You may want to include this if you create a VS PRJ with cmake.
 #include <iostream>
 #include <exception>
+#include <memory>
 
 struct nullptrProbed : public std::exception {
 
@@ -32,7 +33,7 @@ struct Node {
 	*/
 	/// ------------------------------------------------------------------------------------ ///
 
-	Node<T> *next;
+	std::shared_ptr<Node<T>> next;
 	T data;
 
 };
@@ -52,8 +53,8 @@ class Queue {
 
 private:
 
-	Node<T> *head;
-	Node<T> *tail;
+	std::shared_ptr<Node<T>> head;
+	std::shared_ptr<Node<T>> tail;
 	int length;
 
 public:
@@ -84,16 +85,14 @@ public:
 			throw nullptrProbed(); // Can't access this value of the queue, probe led to nullptr
 		}
 		T content = this->head->data;
-		Node<T> *first = new Node<T>;
+		std::shared_ptr<Node<T>> first = std::make_shared<Node<T>>();
 		if (this->head->next == nullptr) {
 			first = nullptr;
 		}
 		else {
 			first = this->head->next;
 		}
-		Node<T>* kill = this->head;
 		this->head = first;
-		delete kill;
 		--(this->length);
 		return content;
 	}
@@ -106,7 +105,7 @@ public:
 		*/
 		/// ------------------------------------------------------------------------------------ ///
 
-		Node<T> *newNode = new Node<T>;
+		std::shared_ptr<Node<T>> newNode = std::make_shared<Node<T>>();
 		newNode->data = value;
 		++(this->length);
 		if (this->head == nullptr) {
@@ -139,7 +138,7 @@ public:
 			return;
 		}
 		std::cout << "[";
-		Node<T> *current = this->head;
+		std::shared_ptr<Node<T>> current = this->head;
 		do {
 			if (current->next == nullptr) {
 				std::cout << current->data << "]";

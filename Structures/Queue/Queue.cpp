@@ -1,5 +1,6 @@
 #include "Queue.h"
 
+
 int main()
 {
 
@@ -9,7 +10,8 @@ int main()
 	*/
 	/// ------------------------------------------------------------------------------------ ///
 
-	std::cout << "We declare a queue as Queue<data_type> variable_name.\nThe following sample declares a queue Q.\n"; Queue<int> Q;
+	std::cout << "We declare a queue as Queue<data_type> variable_name.\nThe following sample declares a queue Q.\n"; 
+	Queue<int> Q;
 	std::cout << "\nChecking if the empty queue is empty: " << Q.isEmpty();
 	std::cout << "\nEmpty queue print method: "; Q.print();
 	Q.push(4);
@@ -20,7 +22,8 @@ int main()
 	std::cout << "\nThe length of the queue after a pop: " << Q.getLength();
 	std::cout << "\nAnd now, the printing of the queue: "; Q.print();
 	Q.push(5);
-	Q.push(3); std::cout << "\nTo check one more time, we will push 5 and 3 to the queue, and print the queue: ";
+	Q.push(3); 
+	std::cout << "\n\nTo check one more time, we will push 5 and 3 to the queue, and print the queue: ";
 	Q.print();
 	std::cout << "\n\n";
 	std::cin.get();

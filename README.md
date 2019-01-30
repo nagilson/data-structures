@@ -2,9 +2,9 @@
 
 [Note!] 
 Looking back on this code, it's really bad. E.g.
-Comments are way too accessive!
-Structs should NOT be outside the data structure class definition -- what if you import multiple structures? And why should you even be able to access the nodes? The original reason I did this was to make testing easier but it's a bad idea... (maybe use a friend test class?)
-Some functions are strange -- why would you want to insert at an index in a linked list? 
+* Comments are way too accessive!
+* Structs should NOT be outside the data structure class definition -- what if you import multiple structures? And why should you even be able to access the nodes? The original reason I did this was to make testing easier but it's a bad idea... (maybe use a friend test class?)
+* Some functions are strange -- why would you want to insert at an index in a linked list? 
 Etc, etc
 
 I wish I had time to fix all of this code and completely rewrite everything, but there's a lot of other stuff I want to work on and school is busy. So for now, I'll leave this up. 
